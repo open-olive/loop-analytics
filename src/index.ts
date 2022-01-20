@@ -59,9 +59,7 @@ export default class Segment {
       }),
     };
     const { statusCode, body } = await network.httpRequest(request);
-    // Or 201, as a analytics event has been fired/created
-    if (statusCode === 200) {
-      // Do we need to return body?
+    if (statusCode >= 200 && statusCode <= 300) {
       console.log('Successfully added tracking event');
     } else {
       console.error(`Unable to send to segment, due to ${statusCode}: ${body}`);
