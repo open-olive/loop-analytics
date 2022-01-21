@@ -11,8 +11,9 @@ import User from '../user';
 import Segment from 'loop-segment';
 
   /*
-  * You can get the userId from user.jwt() aptitude which has been abstracted to a
-  * separate class User
+  * We are using userId from user.jwt() aptitude (part of @oliveai/ldk) which has been
+  * abstracted to a separate class User. But the Segment userId can be populated from other
+  * id sources to fit your use case.
   */
   const { userId } = await User.getUser();
   Segment.init({

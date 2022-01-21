@@ -1,7 +1,7 @@
 {
   "name": "loop-segment",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is a simple wrapper around Segment library to be used for loops in OH",
   "main": "src/index.ts",
   "scripts": {
     "clear": "rm -rf dist || del /s /q dist",
@@ -10,8 +10,9 @@
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Olive",
+  "license": "MIT",
+  "copyright": "Copyright 2022 Olive",
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "eslint": "^8.6.0",
