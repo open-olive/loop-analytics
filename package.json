@@ -14,14 +14,14 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^27.4.0",
-    "eslint": "^8.6.0",
+    "eslint": "^8.7.0",
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",
     "husky": "^7.0.0",
-    "jest": "^27.4.7",
-    "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
+    "jest": "^27.4.0",
+    "prettier": "^2.5.0",
+    "typescript": "^4.5.0"
   },
   "dependencies": {
-    "@oliveai/ldk": "^3.9.2"
+    "@oliveai/ldk": "^3.10.0"
   }
 }
