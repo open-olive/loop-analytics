@@ -1,5 +1,5 @@
 {
-  "name": "loop-segment",
+  "name": "@oliveai/loop-analytics",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",

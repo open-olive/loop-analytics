@@ -15,7 +15,7 @@ interface Config {
   userEmail: string;
 }
 
-export default class Segment {
+export default class Analytics {
   static BASE_URL = 'https://api.segment.io/v1';
 
   static config: Config;
@@ -28,19 +28,19 @@ export default class Segment {
    * Initialize the library with the necessary configuration and identify the user
    */
   static async init(config: Config) {
-    Segment.config = config;
-    Segment.initialized = true;
+    Analytics.config = config;
+    Analytics.initialized = true;
 
-    await Segment.identify();
+    await Analytics.identify();
   }
 
   /**
    * Identify the user with the Segment API, should only be called once at loop startup through init
    */
   static async identify() {
-    const { userEmail } = Segment.config;
+    const { userEmail } = Analytics.config;
 
-    await Segment.postRequest('identify', {
+    await Analytics.postRequest('identify', {
       traits: {
         emailDomain: userEmail.split('@')[1],
       },
@@ -51,12 +51,12 @@ export default class Segment {
    * Track that the user has changed view to a new page (whisper)
    */
   static async page(whisperName: string, whisperUpdated: boolean) {
-    const { loopName } = Segment.config;
+    const { loopName } = Analytics.config;
 
-    Segment.currentPage = whisperName;
+    Analytics.currentPage = whisperName;
 
-    await Segment.postRequest('page', {
-      name: Segment.currentPage,
+    await Analytics.postRequest('page', {
+      name: Analytics.currentPage,
       properties: {
         whisper_updated: whisperUpdated,
         url: `${loopName}/${whisperName}`,
@@ -68,11 +68,11 @@ export default class Segment {
    * Track an event
    */
   static async track(...[event, category, props]: Event) {
-    await Segment.postRequest('track', {
+    await Analytics.postRequest('track', {
       event,
       properties: {
         ...props,
-        whisper_name: Segment.currentPage,
+        whisper_name: Analytics.currentPage,
         category,
         label: props
           ? Object.entries(props)
@@ -84,22 +84,28 @@ export default class Segment {
   }
 
   static async trackComponentClicked(componentType: whisper.WhisperComponentType) {
-    await Segment.track(EventName.ComponentClicked, EventCategory.ClickEvents, {
+    await Analytics.track(EventName.ComponentClicked, EventCategory.ClickEvents, {
+      component_type: componentType,
+    });
+  }
+
+  static async trackComponentCopied(componentType: whisper.WhisperComponentType) {
+    await Analytics.track(EventName.ComponentCopied, EventCategory.ClickEvents, {
       component_type: componentType,
     });
   }
 
   static async trackWhisperClosed() {
-    await Segment.track(EventName.WhisperClosed, EventCategory.Whispers);
+    await Analytics.track(EventName.WhisperClosed, EventCategory.Whispers);
   }
 
   static async trackWhisperDisplayed(whisperName: string, whisperUpdated: boolean) {
-    await Segment.page(whisperName, whisperUpdated);
+    await Analytics.page(whisperName, whisperUpdated);
   }
 
   // To be removed if considered redundant
   static async trackWhisperTriggered(whisperName: string, triggeredFrom: string) {
-    await Segment.track(EventName.WhisperTriggered, EventCategory.Whispers, {
+    await Analytics.track(EventName.WhisperTriggered, EventCategory.Whispers, {
       whisper_name: whisperName,
       triggered_from: triggeredFrom,
     });
@@ -111,13 +117,13 @@ export default class Segment {
    * Should not be called directly, use identify, page, or track instead
    */
   private static async postRequest(...[endpoint, body]: SegmentRequest) {
-    if (!Segment.initialized) {
+    if (!Analytics.initialized) {
       throw new Error('Segment not initialized');
     }
-    const { loopName, userId, writeKey } = Segment.config;
+    const { loopName, userId, writeKey } = Analytics.config;
 
     const request: network.HTTPRequest = {
-      url: `${Segment.BASE_URL}/${endpoint}`,
+      url: `${Analytics.BASE_URL}/${endpoint}`,
       method: 'POST',
       headers: {
         Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
@@ -144,31 +150,32 @@ export function wrap(component: whisper.Component) {
   /**
    * This generic function accepts the existing handler and the desired event function, returns a
    * function that calls the event function and then calls the existing handler if it exists.
-   * I can't imagine there's not a cleaner way to write this but the principle is sound
+   *
+   * TODO:  Figure out what the handler type can be without making a giant conditional type of all whisper handlers
    */
-  function handlerWrapper<F extends (...args: unknown[]) => void>(
-    fn: F | undefined,
-    eventFn: () => void
+  function handlerWrapper<F extends (...args: any[]) => void>(
+    handler: F | undefined,
+    trackFn: () => Promise<void>
   ) {
-    return function _(...args: unknown[]) {
-      eventFn();
-      if (fn) fn(...args);
+    return async function _(...args: unknown[]) {
+      await trackFn();
+      if (handler) handler(...args);
     };
   }
 
-  // TODO: Figure out what the type needs to be so we don't use any without making it a giant nest of conditional typing for every component handler
-  const onClickWrapper = <F extends (...args: any[]) => void>(
-    fn: F | undefined,
-    clickedComponent: whisper.Component
-  ) => {
-    return handlerWrapper(fn, () => Segment.trackComponentClicked(clickedComponent.type));
-  };
-
+  // === Click Handlers ===
+  const onClickHandler = async () => Analytics.trackComponentClicked(component.type);
   if ('onClick' in component) {
-    component.onClick = onClickWrapper(component.onClick, component);
+    component.onClick = handlerWrapper(component.onClick, onClickHandler);
   }
   if ('onLinkClick' in component) {
-    component.onLinkClick = onClickWrapper(component.onLinkClick, component);
+    component.onLinkClick = handlerWrapper(component.onLinkClick, onClickHandler);
+  }
+
+  // === Copy Handlers ===
+  const onCopyHandler = async () => Analytics.trackComponentCopied(component.type);
+  if ('onCopy' in component) {
+    component.onCopy = handlerWrapper(component.onCopy, onCopyHandler);
   }
 
   return component;
@@ -183,8 +190,14 @@ export function wrap(component: whisper.Component) {
  */
 export function wrapComponents(components: whisper.Component[]) {
   return components.map((component) => {
+    // Wrap each component in Box or CollapseBox children
     if ('children' in component) {
       component.children = wrapComponents(component.children) as typeof component.children;
+      return component;
+    }
+    // Wrap each component in Breadcrumb children
+    if ('links' in component) {
+      component.links = wrapComponents(component.links) as typeof component.links;
       return component;
     }
     return wrap(component);

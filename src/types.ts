@@ -27,6 +27,7 @@ export type SegmentRequest =
  */
 export enum EventName {
   ComponentClicked = 'Component Clicked',
+  ComponentCopied = 'Component Copied',
   LoopStarted = 'Loop Started',
   WhisperClosed = 'Whisper Closed',
   WhisperDisplayed = 'Whisper Displayed',
@@ -51,7 +52,7 @@ export enum EventCategory {
  */
 export type Event =
   | [
-      EventName.ComponentClicked,
+      EventName.ComponentClicked | EventName.ComponentCopied,
       EventCategory.ClickEvents,
       {
         component_type: whisper.WhisperComponentType;
