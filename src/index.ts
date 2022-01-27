@@ -29,9 +29,13 @@ export default class Segment {
    */
   static async init(config: Config) {
     Segment.config = config;
-    Segment.initialized = true;
 
-    await Segment.identify();
+    const { statusCode } = await Segment.identify();
+    if (statusCode < 200 || statusCode >= 300) {
+      console.warn('Failed to identify user with Segment');
+    } else {
+      Segment.initialized = true;
+    }
   }
 
   /**
@@ -40,7 +44,7 @@ export default class Segment {
   static async identify() {
     const { userEmail } = Segment.config;
 
-    await Segment.postRequest('identify', {
+    return Segment.postRequest('identify', {
       traits: {
         emailDomain: userEmail.split('@')[1],
       },
@@ -139,7 +143,7 @@ export default class Segment {
       }),
     };
 
-    await network.httpRequest(request);
+    return network.httpRequest(request);
   }
 }
 
