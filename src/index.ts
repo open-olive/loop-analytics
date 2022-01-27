@@ -15,7 +15,7 @@ interface Config {
   userEmail: string;
 }
 
-export default class Analytics {
+export default class Segment {
   static BASE_URL = 'https://api.segment.io/v1';
 
   static config: Config;
@@ -28,19 +28,19 @@ export default class Analytics {
    * Initialize the library with the necessary configuration and identify the user
    */
   static async init(config: Config) {
-    Analytics.config = config;
-    Analytics.initialized = true;
+    Segment.config = config;
+    Segment.initialized = true;
 
-    await Analytics.identify();
+    await Segment.identify();
   }
 
   /**
    * Identify the user with the Segment API, should only be called once at loop startup through init
    */
   static async identify() {
-    const { userEmail } = Analytics.config;
+    const { userEmail } = Segment.config;
 
-    await Analytics.postRequest('identify', {
+    await Segment.postRequest('identify', {
       traits: {
         emailDomain: userEmail.split('@')[1],
       },
@@ -51,12 +51,12 @@ export default class Analytics {
    * Track that the user has changed view to a new page (whisper)
    */
   static async page(whisperName: string, whisperUpdated: boolean) {
-    const { loopName } = Analytics.config;
+    const { loopName } = Segment.config;
 
-    Analytics.currentPage = whisperName;
+    Segment.currentPage = whisperName;
 
-    await Analytics.postRequest('page', {
-      name: Analytics.currentPage,
+    await Segment.postRequest('page', {
+      name: Segment.currentPage,
       properties: {
         whisper_updated: whisperUpdated,
         url: `${loopName}/${whisperName}`,
@@ -68,11 +68,11 @@ export default class Analytics {
    * Track an event
    */
   static async track(...[event, category, props]: Event) {
-    await Analytics.postRequest('track', {
+    await Segment.postRequest('track', {
       event,
       properties: {
         ...props,
-        whisper_name: Analytics.currentPage,
+        whisper_name: Segment.currentPage,
         category,
         label: props
           ? Object.entries(props)
@@ -84,28 +84,28 @@ export default class Analytics {
   }
 
   static async trackComponentClicked(componentType: whisper.WhisperComponentType) {
-    await Analytics.track(EventName.ComponentClicked, EventCategory.ClickEvents, {
+    await Segment.track(EventName.ComponentClicked, EventCategory.ClickEvents, {
       component_type: componentType,
     });
   }
 
   static async trackComponentCopied(componentType: whisper.WhisperComponentType) {
-    await Analytics.track(EventName.ComponentCopied, EventCategory.ClickEvents, {
+    await Segment.track(EventName.ComponentCopied, EventCategory.ClickEvents, {
       component_type: componentType,
     });
   }
 
   static async trackWhisperClosed() {
-    await Analytics.track(EventName.WhisperClosed, EventCategory.Whispers);
+    await Segment.track(EventName.WhisperClosed, EventCategory.Whispers);
   }
 
   static async trackWhisperDisplayed(whisperName: string, whisperUpdated: boolean) {
-    await Analytics.page(whisperName, whisperUpdated);
+    await Segment.page(whisperName, whisperUpdated);
   }
 
   // To be removed if considered redundant
   static async trackWhisperTriggered(whisperName: string, triggeredFrom: string) {
-    await Analytics.track(EventName.WhisperTriggered, EventCategory.Whispers, {
+    await Segment.track(EventName.WhisperTriggered, EventCategory.Whispers, {
       whisper_name: whisperName,
       triggered_from: triggeredFrom,
     });
@@ -117,13 +117,13 @@ export default class Analytics {
    * Should not be called directly, use identify, page, or track instead
    */
   private static async postRequest(...[endpoint, body]: SegmentRequest) {
-    if (!Analytics.initialized) {
+    if (!Segment.initialized) {
       throw new Error('Segment not initialized');
     }
-    const { loopName, userId, writeKey } = Analytics.config;
+    const { loopName, userId, writeKey } = Segment.config;
 
     const request: network.HTTPRequest = {
-      url: `${Analytics.BASE_URL}/${endpoint}`,
+      url: `${Segment.BASE_URL}/${endpoint}`,
       method: 'POST',
       headers: {
         Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
@@ -164,7 +164,7 @@ export function wrap(component: whisper.Component) {
   }
 
   // === Click Handlers ===
-  const onClickHandler = async () => Analytics.trackComponentClicked(component.type);
+  const onClickHandler = async () => Segment.trackComponentClicked(component.type);
   if ('onClick' in component) {
     component.onClick = handlerWrapper(component.onClick, onClickHandler);
   }
@@ -173,7 +173,7 @@ export function wrap(component: whisper.Component) {
   }
 
   // === Copy Handlers ===
-  const onCopyHandler = async () => Analytics.trackComponentCopied(component.type);
+  const onCopyHandler = async () => Segment.trackComponentCopied(component.type);
   if ('onCopy' in component) {
     component.onCopy = handlerWrapper(component.onCopy, onCopyHandler);
   }

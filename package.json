@@ -1,5 +1,5 @@
 {
-  "name": "@oliveai/loop-analytics",
+  "name": "loop-segment",
   "version": "1.0.0",
   "description": "This is a simple wrapper around Segment library to be used for loops in OH",
   "main": "src/index.ts",
