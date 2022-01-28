@@ -1,10 +1,33 @@
 import { whisper } from '@oliveai/ldk';
 
 /**
- * Make sure to Title Case, keep alphabetical
+ * Define each of the requests we can make to Segment with expected body fields
+ */
+export type SegmentRequest =
+  | ['identify', { traits: { emailDomain: string }; properties?: Record<string, string> }]
+  | [
+      'page',
+      {
+        name: string;
+        properties: { whisper_updated: boolean; url: string };
+      }
+    ]
+  | [
+      'track',
+      {
+        event: string;
+        properties: { whisper_name: string; category: string; label?: string };
+      }
+    ];
+
+/**
+ * All of the event names we are tracking
+ *
+ * Make sure to Title Case and keep alphabetical
  */
 export enum EventName {
   ComponentClicked = 'Component Clicked',
+  ComponentCopied = 'Component Copied',
   LoopStarted = 'Loop Started',
   WhisperClosed = 'Whisper Closed',
   WhisperDisplayed = 'Whisper Displayed',
@@ -13,35 +36,37 @@ export enum EventName {
 
 /**
  * Categories used by GA
+ *
+ * Make sure to snake_case and keep alphabetical
  */
 export enum EventCategory {
-  ClickEvents = 'click_events',
-  Loops = 'loops',
-  Whispers = 'whispers',
+  ClickEvents = 'Click Events',
+  Loops = 'Loops',
+  Whispers = 'Whispers',
 }
 
 /**
  * Enforce which properties are required for each event name
+ *
+ * Make sure property keys are snake_case
  */
 export type Event =
   | [
-      EventName.ComponentClicked,
+      EventName.ComponentClicked | EventName.ComponentCopied,
       EventCategory.ClickEvents,
       {
-        whisper_name: string;
         component_type: whisper.WhisperComponentType;
-        component_text: string;
       }
     ]
   | [EventName.LoopStarted, EventCategory.Loops]
-  | [EventName.WhisperClosed, EventCategory.Whispers, { whisper_type: string }]
+  | [EventName.WhisperClosed, EventCategory.Whispers]
   | [
       EventName.WhisperDisplayed,
       EventCategory.Whispers,
-      { whisper_type: string; whisper_updated: boolean }
+      { whisper_name: string; whisper_updated: boolean }
     ]
   | [
       EventName.WhisperTriggered,
       EventCategory.Whispers,
-      { whisper_type: string; triggered_from: string }
+      { triggered_from: string; whisper_name: string }
     ];
