@@ -29,22 +29,22 @@ export default class Segment {
    */
   static async init(config: Config) {
     Segment.config = config;
+    Segment.initialized = true;
 
-    const { statusCode } = await Segment.identify();
-    if (statusCode < 200 || statusCode >= 300) {
-      console.warn('Failed to identify user with Segment');
-    } else {
-      Segment.initialized = true;
-    }
+    await Segment.identify();
   }
 
   /**
    * Identify the user with the Segment API, should only be called once at loop startup through init
    */
   static async identify() {
+    if (!Segment.initialized) {
+      console.error(`Segment not initialized, skipping Identify call`);
+      return;
+    }
     const { userEmail } = Segment.config;
 
-    return Segment.postRequest('identify', {
+    Segment.postRequest('identify', {
       traits: {
         emailDomain: userEmail.split('@')[1],
       },
@@ -55,6 +55,10 @@ export default class Segment {
    * Track that the user has changed view to a new page (whisper)
    */
   static async page(whisperName: string, whisperUpdated: boolean) {
+    if (!Segment.initialized) {
+      console.error(`Segment not initialized, skipping Page call for [${whisperName}]`);
+      return;
+    }
     const { loopName } = Segment.config;
 
     Segment.currentPage = whisperName;
@@ -72,6 +76,10 @@ export default class Segment {
    * Track an event
    */
   static async track(...[event, category, props]: Event) {
+    if (!Segment.initialized) {
+      console.error(`Segment not initialized, skipping Track call for [${event}]`);
+      return;
+    }
     await Segment.postRequest('track', {
       event,
       properties: {
@@ -122,28 +130,32 @@ export default class Segment {
    */
   private static async postRequest(...[endpoint, body]: SegmentRequest) {
     if (!Segment.initialized) {
-      throw new Error('Segment not initialized');
-    }
-    const { loopName, userId, writeKey } = Segment.config;
+      console.warn('Segment not initialized, but this method is private so how did you get here?');
+    } else {
+      const { loopName, userId, writeKey } = Segment.config;
 
-    const request: network.HTTPRequest = {
-      url: `${Segment.BASE_URL}/${endpoint}`,
-      method: 'POST',
-      headers: {
-        Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
-        'Content-Type': ['application/json'],
-      },
-      body: JSON.stringify({
-        ...body,
-        userId,
-        properties: {
-          ...body.properties,
-          loop_name: loopName,
+      const request: network.HTTPRequest = {
+        url: `${Segment.BASE_URL}/${endpoint}`,
+        method: 'POST',
+        headers: {
+          Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
+          'Content-Type': ['application/json'],
         },
-      }),
-    };
+        body: JSON.stringify({
+          ...body,
+          userId,
+          properties: {
+            ...body.properties,
+            loop_name: loopName,
+          },
+        }),
+      };
 
-    return network.httpRequest(request);
+      const { statusCode } = await network.httpRequest(request);
+      if (statusCode < 200 || statusCode >= 300) {
+        console.error(`Segment request to [${endpoint}] failed with status code [${statusCode}]`);
+      }
+    }
   }
 }
 
