@@ -137,29 +137,30 @@ export default class Segment {
   private static async postRequest(...[endpoint, body]: SegmentRequest) {
     if (!Segment.initialized) {
       console.warn('Segment not initialized, but this method is private so how did you get here?');
-    }
-    const { loopName, userId, writeKey } = Segment.config;
+    } else {
+      const { loopName, userId, writeKey } = Segment.config;
 
-    const request: network.HTTPRequest = {
-      url: `${Segment.BASE_URL}/${endpoint}`,
-      method: 'POST',
-      headers: {
-        Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
-        'Content-Type': ['application/json'],
-      },
-      body: JSON.stringify({
-        ...body,
-        userId,
-        properties: {
-          ...body.properties,
-          loop_name: loopName,
+      const request: network.HTTPRequest = {
+        url: `${Segment.BASE_URL}/${endpoint}`,
+        method: 'POST',
+        headers: {
+          Authorization: [`Basic ${btoa(`${writeKey}:`)}`],
+          'Content-Type': ['application/json'],
         },
-      }),
-    };
+        body: JSON.stringify({
+          ...body,
+          userId,
+          properties: {
+            ...body.properties,
+            loop_name: loopName,
+          },
+        }),
+      };
 
-    const { statusCode } = await network.httpRequest(request);
-    if (statusCode < 200 || statusCode >= 300) {
-      console.error(`Segment request to [${endpoint}] failed with status code [${statusCode}]`);
+      const { statusCode } = await network.httpRequest(request);
+      if (statusCode < 200 || statusCode >= 300) {
+        console.error(`Segment request to [${endpoint}] failed with status code [${statusCode}]`);
+      }
     }
   }
 }
