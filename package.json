@@ -9,7 +9,7 @@
     "build": "npm run clear && tsc",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
-    "prepare": "npm run build"
+    "install": "npm run build"
   },
   "author": "Olive",
   "license": "MIT",
