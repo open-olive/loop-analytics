@@ -47,7 +47,9 @@ export class GoogleTransport extends Transport<GoogleTransportConfig> {
       method: 'POST',
       url: this.baseUrl,
       headers: {
-        'User-Agent': ['OliveHelps/loop-analytics'],
+        'User-Agent': [
+          `OliveHelps @oliveai/loop-analytics ${this.loopConfig.name.replace(/ /g, '')}`,
+        ],
       },
       body: this.buildRequestBody(hitType, props),
     };
