@@ -8,8 +8,7 @@
     "clear": "rm -rf dist || del /s /q dist",
     "build": "npm run clear && tsc",
     "lint": "eslint ./ --ignore-path .gitignore",
-    "lint:fix": "npm run lint -- --fix",
-    "prepare": "npm run build"
+    "lint:fix": "npm run lint -- --fix"
   },
   "author": "Olive",
   "license": "MIT",
@@ -23,20 +22,7 @@
     "typescript": "^4.5.0"
   },
   "dependencies": {
-    "@babel/core": "^7.15.8",
-    "@babel/plugin-transform-async-to-generator": "^7.13.0",
-    "@babel/plugin-transform-destructuring": "^7.13.0",
-    "@babel/plugin-transform-runtime": "^7.15.8",
-    "@babel/preset-env": "^7.15.8",
-    "@babel/runtime": "^7.13.10",
-    "@babel/runtime-corejs2": "^7.13.10",
-    "@oliveai/ldk": "^3.10.0",
-    "babel-loader": "^8.2.2",
-    "core-js": "^3.19.2",
-    "terser-webpack-plugin": "^5.1.1",
-    "webpack": "^5.64.4",
-    "webpack-cli": "^4.9.0",
-    "webpack-merge": "^5.7.3"
+    "@oliveai/ldk": "^3.10.0"
   },
   "repository": {
     "type": "git",
