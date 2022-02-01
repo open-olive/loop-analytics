@@ -2,7 +2,8 @@
   "name": "@oliveai/loop-analytics",
   "version": "1.0.0",
   "description": "This library for handling analytics through the network aptitude for loops, currently supporting Segment and GA",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clear": "rm -rf dist || del /s /q dist",
     "build": "npm run clear && tsc",
@@ -24,5 +25,9 @@
   },
   "dependencies": {
     "@oliveai/ldk": "^3.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-olive/loop-analytics.git"
   }
 }
