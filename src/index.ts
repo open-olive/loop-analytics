@@ -4,7 +4,7 @@ import { Component, WhisperComponentType } from '@oliveai/ldk/dist/whisper';
 
 import { Transport } from './transports/baseTransport';
 
-export * from './transports';
+export { GoogleTransport, SegmentTransport } from './transports';
 
 export default class Analytics {
   transport?: Transport;
