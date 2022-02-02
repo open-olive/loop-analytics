@@ -1,8 +1,14 @@
-import { TransportConfig } from '../base';
+import { TransportConfig, UserConfig } from '../base';
 
 export interface SegmentTransportConfig extends TransportConfig {
   apiVersion?: string;
   writeKey: string;
+}
+
+export interface SegmentUserConfig extends UserConfig {
+  emailDomain: string;
+  organization: string;
+  operatingSystem: string;
 }
 
 interface CommonProps {

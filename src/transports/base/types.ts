@@ -5,9 +5,6 @@ export interface TransportConfig {}
 
 export interface UserConfig {
   id: string;
-  emailDomain: string;
-  organization: string;
-  operatingSystem: string;
 }
 
 export interface LoopConfig {
