@@ -3,6 +3,8 @@ import { whisper } from '@oliveai/ldk';
 import { BaseTransport } from '../base';
 import { GoogleTransportConfig, EventProps, HitType } from './types';
 
+export * as GoogleTransportTypes from './types';
+
 export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   baseUrl = 'https://google-analytics.com/collect';
 

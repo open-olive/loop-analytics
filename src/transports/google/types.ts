@@ -11,7 +11,7 @@ export interface EventProps {
   label: string;
 }
 
-interface CategoryActionObj {
+export interface CategoryActionObj {
   category: string;
   action: string;
 }

@@ -11,7 +11,7 @@ export interface SegmentUserConfig extends UserConfig {
   operatingSystem: string;
 }
 
-interface CommonProps {
+export interface CommonProps {
   userId?: string;
   properties?: {
     whisper_name?: string;
@@ -19,7 +19,7 @@ interface CommonProps {
   };
 }
 
-type IdentifyProps = {
+export type IdentifyProps = {
   event?: never;
   name?: never;
   traits: {
@@ -29,7 +29,7 @@ type IdentifyProps = {
   };
 } & CommonProps;
 
-type PageProps = {
+export type PageProps = {
   event?: never;
   name: string;
   properties: { whisper_updated: boolean };

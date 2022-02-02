@@ -3,6 +3,8 @@ import { WhisperComponentType } from '@oliveai/ldk/dist/whisper';
 import { BaseTransport, LoopConfig } from '../base';
 import { TrackProps, SegmentProps, SegmentTransportConfig, SegmentUserConfig } from './types';
 
+export * as SegmentTransportTypes from './types';
+
 export class SegmentTransport extends BaseTransport<SegmentTransportConfig, SegmentUserConfig> {
   baseUrl = `https://api.segment.io/${this.transportConfig.apiVersion || 'v1'}`;
 
