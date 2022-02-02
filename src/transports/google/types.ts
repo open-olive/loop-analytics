@@ -1,4 +1,4 @@
-import { TransportConfig } from '../baseTransport';
+import { TransportConfig } from '../base';
 
 export enum HitType {
   PageView = 'pageView',

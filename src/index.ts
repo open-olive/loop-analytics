@@ -2,14 +2,12 @@
 /* eslint-disable no-param-reassign */
 import { Component, WhisperComponentType } from '@oliveai/ldk/dist/whisper';
 
-import { Transport } from './transports/baseTransport';
+import * as Transports from './transports';
 
-export { GoogleTransport, SegmentTransport } from './transports';
+class AnalyticsClient {
+  transport?: Transports.BaseTransport;
 
-export default class Analytics {
-  transport?: Transport;
-
-  setTransport(transport: Transport) {
+  setTransport(transport: Transports.BaseTransport) {
     this.transport = transport;
   }
 
@@ -99,3 +97,5 @@ export default class Analytics {
     });
   }
 }
+
+export { AnalyticsClient, Transports };

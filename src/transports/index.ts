@@ -1,4 +1,3 @@
-import { GoogleTransport } from './google';
-import { SegmentTransport } from './segment';
-
-export { GoogleTransport, SegmentTransport };
+export * from './base';
+export * from './google';
+export * from './segment';

@@ -1,9 +1,9 @@
 import { whisper } from '@oliveai/ldk';
 
-import { Transport } from '../baseTransport';
+import { BaseTransport } from '../base';
 import { GoogleTransportConfig, EventProps, HitType } from './types';
 
-export class GoogleTransport extends Transport<GoogleTransportConfig> {
+export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   baseUrl = 'https://google-analytics.com/collect';
 
   async trackWhisperDisplayed(name: string, isUpdated: boolean) {
