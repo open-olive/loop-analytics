@@ -8,28 +8,31 @@ export enum HitType {
 export interface EventProps {
   category: string;
   action: string;
-  label: string;
-}
-
-export interface CategoryActionObj {
-  category: string;
-  action: string;
+  label?: string;
 }
 
 export interface CategoryActionMap {
-  [key: string]: CategoryActionObj;
-  whisperDisplayed: CategoryActionObj;
-  whisperClosed: CategoryActionObj;
-  componentClicked: CategoryActionObj;
-  componentCopied: CategoryActionObj;
+  [key: string]: EventProps;
+  whisperDisplayed: EventProps;
+  whisperClosed: EventProps;
+  componentClicked: EventProps;
+  componentCopied: EventProps;
+}
+
+export interface CustomDimensionOrMetric {
+  index: number;
+  name: string;
+  value: string;
 }
 
 export interface GoogleTransportConfig extends TransportConfig {
   apiVersion?: number;
   trackingId: string;
+  userAgent: string;
   /** Set expectations for what categories and actions are going to be used */
   categoryActionMap: CategoryActionMap;
   /** Map custom dimension index to an alias name and set its value */
-  customDimensions?: { index: number; name: string; value: string }[];
-  customMetrics?: { index: number; name: string; value: string }[];
+  customDimensions?: CustomDimensionOrMetric[];
+  /** Map custom metric index to an alias name and set its value */
+  customMetrics?: CustomDimensionOrMetric[];
 }

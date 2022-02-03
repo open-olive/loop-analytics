@@ -15,7 +15,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
 
     await this.trackEvent({
       ...this.transportConfig.categoryActionMap.whisperDisplayed,
-      label: isUpdated ? 'Updated' : 'Created',
+      label: `${name}, ${isUpdated ? 'updated' : 'created'}`,
     });
   }
 
@@ -44,14 +44,12 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
     await GoogleTransport.send(this.buildRequest(HitType.Event, props));
   }
 
-  private buildRequest(hitType: HitType, props?: EventProps) {
+  protected buildRequest(hitType: HitType, props?: EventProps) {
     return {
       method: 'POST',
       url: this.baseUrl,
       headers: {
-        'User-Agent': [
-          `OliveHelps @oliveai/loop-analytics ${this.loopConfig.name.replace(/ /g, '')}`,
-        ],
+        'User-Agent': [this.transportConfig.userAgent], // Required by GA
       },
       body: this.buildRequestBody(hitType, props),
     };
@@ -71,12 +69,12 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
       t: hitType,
       dh: this.loopConfig.name,
       dp: `/${this.loopConfig.name}/${this.currentWhisperName}`,
-      dt: this.currentWhisperName || '',
+      dt: this.currentWhisperName ?? '',
     };
     if (hitType === HitType.Event && props) {
       propStringObj.ec = props.category;
       propStringObj.ea = props.action;
-      propStringObj.el = props.label;
+      propStringObj.el = props.label ?? '';
     }
     customDimensions?.forEach(({ index, value }) => {
       propStringObj[`cd${index}`] = value;
@@ -86,6 +84,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
     });
 
     return Object.entries(propStringObj)
+      .filter(([, value]) => !!value)
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
   }

@@ -5,7 +5,7 @@ import { Component, WhisperComponentType } from '@oliveai/ldk/dist/whisper';
 import * as Transports from './transports';
 
 class AnalyticsClient {
-  transport?: Transports.BaseTransport;
+  constructor(public transport?: Transports.BaseTransport) {}
 
   setTransport(transport: Transports.BaseTransport) {
     this.transport = transport;

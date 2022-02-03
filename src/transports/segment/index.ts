@@ -72,7 +72,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
     await SegmentTransport.send(this.buildRequest('/track', props));
   }
 
-  private buildRequest(endpoint: string, props: SegmentProps) {
+  protected buildRequest(endpoint: string, props: SegmentProps) {
     return {
       method: 'POST',
       url: `${this.baseUrl}${endpoint}`,
@@ -83,7 +83,9 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
 
   private buildRequestHeaders() {
     return {
-      Authorization: [`Basic ${btoa(`${this.transportConfig.writeKey}:`)}`],
+      Authorization: [
+        `Basic ${Buffer.from(`${this.transportConfig.writeKey}:`).toString('base64')}`,
+      ],
       'Content-Type': ['application/json'],
     };
   }

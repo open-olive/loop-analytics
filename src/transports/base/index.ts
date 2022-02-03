@@ -15,7 +15,7 @@ export abstract class BaseTransport<
 
   constructor(readonly transportConfig: T, readonly userConfig: U, readonly loopConfig: L) {}
 
-  static async send(request: network.HTTPRequest) {
+  protected static async send(request: network.HTTPRequest) {
     const { statusCode } = await network.httpRequest(request);
     if (statusCode < 200 || statusCode >= 300) {
       console.error(`Request failed with status code ${statusCode}: ${request.url}`);
@@ -31,4 +31,6 @@ export abstract class BaseTransport<
   abstract trackComponentCopied(type: whisper.WhisperComponentType): Promise<void>;
 
   abstract trackEvent(props: any): Promise<void>;
+
+  protected abstract buildRequest(...args: any[]): network.HTTPRequest;
 }
