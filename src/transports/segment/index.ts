@@ -11,6 +11,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   constructor(...args: [SegmentTransportConfig, SegmentUserConfig, LoopConfig]) {
     super(...args);
 
+    // We want to identify the user immediately after instantiating the transport
     this.identifyUser();
   }
 
@@ -29,6 +30,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   }
 
   async trackWhisperDisplayed(name: string, isUpdated: boolean) {
+    // Set the current whisper name so that we can use it in the event properties
     this.currentWhisperName = name;
 
     await SegmentTransport.send(
@@ -91,6 +93,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   }
 
   private buildRequestBody(props: SegmentProps) {
+    // Set default properties but allow them to be overridden if the method sends in values
     return {
       userId: this.userConfig.id,
       ...props,

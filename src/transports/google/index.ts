@@ -9,10 +9,13 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   baseUrl = 'https://google-analytics.com/collect';
 
   async trackWhisperDisplayed(name: string, isUpdated: boolean) {
+    // Set current whisper for events to reference
     this.currentWhisperName = name;
 
+    // Tell Google there was a page view
     await GoogleTransport.send(this.buildRequest(HitType.PageView));
 
+    // Also send an event for it
     await this.trackEvent({
       ...this.transportConfig.categoryActionMap.whisperDisplayed,
       label: `${name}, ${isUpdated ? 'updated' : 'created'}`,
@@ -58,10 +61,9 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   private buildRequestBody(hitType: HitType, props?: EventProps) {
     const { apiVersion, trackingId, customDimensions, customMetrics } = this.transportConfig;
     const { id: userId } = this.userConfig;
-    /**
-     * Build an object for all of the properties we'll need to send to Google
-     * https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-     */
+
+    // Build an object for all of the properties we'll need to send to Google
+    // https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
     const propStringObj: Record<string, string> = {
       v: (apiVersion || 1).toString(),
       tid: trackingId,
@@ -71,11 +73,14 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
       dp: `/${this.loopConfig.name}/${this.currentWhisperName}`,
       dt: this.currentWhisperName ?? '',
     };
+
     if (hitType === HitType.Event && props) {
       propStringObj.ec = props.category;
       propStringObj.ea = props.action;
       propStringObj.el = props.label ?? '';
     }
+
+    // Do some quick transformations of any custom dimensions and metrics
     customDimensions?.forEach(({ index, value }) => {
       propStringObj[`cd${index}`] = value;
     });
@@ -83,6 +88,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
       propStringObj[`cm${index}`] = value;
     });
 
+    // Turn our object into a query string
     return Object.entries(propStringObj)
       .filter(([, value]) => !!value)
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)

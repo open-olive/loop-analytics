@@ -4,34 +4,65 @@ import { Component, WhisperComponentType } from '@oliveai/ldk/dist/whisper';
 
 import * as Transports from './transports';
 
+/**
+ * Main class for interacting with different analytics providers
+ * Must be provided a Transport at construction or before calling any track methods
+ */
 class AnalyticsClient {
   constructor(public transport?: Transports.BaseTransport) {}
 
+  /** Provided for setting the transport after instancing */
   setTransport(transport: Transports.BaseTransport) {
     this.transport = transport;
   }
 
+  /**
+   * Default method for what to do when a whisper is displayed
+   *
+   * @param whisperName Either the label or a distinct name for the whisper
+   * @param isUpdated Whether the whisper was displayed through create or update
+   */
   async trackWhisperDisplayed(whisperName: string, isUpdated: boolean) {
     if (!this.transport) return;
     await this.transport.trackWhisperDisplayed(whisperName, isUpdated);
   }
 
+  /**
+   * Default method for what to do when a whisper is closed
+   *
+   * @param whisperName Either the label or a distinct name for the whisper
+   */
   async trackWhisperClosed(whisperName: string) {
     if (!this.transport) return;
     await this.transport.trackWhisperClosed(whisperName);
   }
 
+  /**
+   * Default method for what to do when a component's onClick handler is triggered
+   *
+   * @param componentType The LDK provided identifier for the type of component
+   */
   async trackComponentClicked(componentType: WhisperComponentType) {
     if (!this.transport) return;
     await this.transport.trackComponentClicked(componentType);
   }
 
+  /**
+   * Default method for what to do when a component's onCopy handler is triggered
+   *
+   * @param componentType The LDK provided identifier for the type of component
+   */
   async trackComponentCopied(componentType: WhisperComponentType) {
     if (!this.transport) return;
     await this.transport.trackComponentCopied(componentType);
   }
 
-  async trackEvent(props: any) {
+  /**
+   * Generic tracking method, up to the Transport to define what the props should be
+   *
+   * @param props Some kind of object passed through to the Transport for handling events
+   */
+  async trackEvent(props: Record<string, unknown>) {
     if (!this.transport) return;
     await this.transport.trackEvent(props);
   }
