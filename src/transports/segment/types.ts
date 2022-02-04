@@ -1,7 +1,10 @@
 import { TransportConfig, UserConfig } from '../base';
 
+/** Define the necessary properties for us to connect to Segment */
 export interface SegmentTransportConfig extends TransportConfig {
+  /** Segment API version, default v1 */
   apiVersion?: string;
+  /** Segment write key, will be converted to the appropriate auth header automatically */
   writeKey: string;
 }
 
