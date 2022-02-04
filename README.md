@@ -55,7 +55,9 @@ import { LOOP_NAME } from './index';
 const createAnalyticsClient = async () => {
   // Helper function to fetch the user's JWT and decode the payload
   const getUserInfo = async () =>
-    jwtDecode<{ email: string; org: string; sub: string }>(await user.jwt({ includeEmail: true }));
+    jwtDecode<{ email: string; org: string; sub: string }>(
+      await user.jwt({ includeEmail: true })
+    );
 
   // Get the info we need from LDK
   const { sub: userId, email, org } = await getUserInfo();
@@ -89,41 +91,43 @@ const createAnalyticsClient = async () => {
   };
 
   // An example of how to set custom dimensions, use whatever is appropriate
-  const customDimensions: Transports.GoogleTransportTypes.CustomDimensionOrMetric[] = [
-    {
-      index: 1,
-      name: 'Loop Name',
-      value: LOOP_NAME,
-    },
-    {
-      index: 2,
-      name: 'User ID',
-      value: userId, // The user's generated ID in Loop Library, not considered PII
-    },
-    {
-      index: 3,
-      name: 'Email Domain',
-      value: email.split('@')[1], // ONLY send the email domain, full email would be PII
-    },
-    {
-      index: 4,
-      name: 'Organization',
-      value: org,
-    },
-    {
-      index: 5,
-      name: 'Operating System',
-      value: os,
-    },
-  ];
+  const customDimensions: Transports.GoogleTransportTypes.CustomDimensionOrMetric[] =
+    [
+      {
+        index: 1,
+        name: 'Loop Name',
+        value: LOOP_NAME,
+      },
+      {
+        index: 2,
+        name: 'User ID',
+        value: userId, // The user's generated ID in Loop Library, not considered PII
+      },
+      {
+        index: 3,
+        name: 'Email Domain',
+        value: email.split('@')[1], // ONLY send the email domain, full email would be PII
+      },
+      {
+        index: 4,
+        name: 'Organization',
+        value: org,
+      },
+      {
+        index: 5,
+        name: 'Operating System',
+        value: os,
+      },
+    ];
 
-  const transportConfig: Transports.GoogleTransportTypes.GoogleTransportConfig = {
-    trackingId: 'UA-12345678-90',
-    // Can be whatever you want but is required for Google's request headers
-    userAgent: LOOP_NAME,
-    categoryActionMap,
-    customDimensions,
-  };
+  const transportConfig: Transports.GoogleTransportTypes.GoogleTransportConfig =
+    {
+      trackingId: 'UA-12345678-90',
+      // Can be whatever you want but is required for Google's request headers
+      userAgent: LOOP_NAME,
+      categoryActionMap,
+      customDimensions,
+    };
 
   const userConfig: Transports.UserConfig = {
     id: userId,
@@ -148,14 +152,17 @@ export default await createAnalyticsClient();
 import { whisper } from '@oliveai/ldk';
 import GA from './analytics';
 
+export const LOOP_NAME = 'My Awesome Loop';
+
 (async () => {
   const label = 'Hello World!';
 
   whisper.create({
     label,
     components: [],
+    onClose: () => GA.trackWhisperClosed(label),
   });
 
-  GA.trackWhisperDisplayed(label);
+  GA.trackWhisperDisplayed(label, false);
 })();
 ```
