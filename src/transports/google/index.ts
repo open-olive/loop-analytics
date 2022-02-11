@@ -13,7 +13,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
     this.currentWhisperName = name;
 
     // Tell Google there was a page view
-    await GoogleTransport.send(this.buildRequest(HitType.PageView), this.transportConfig.debug);
+    await this.send(this.buildRequest(HitType.PageView));
 
     // Also send an event for it
     await this.trackEvent({
@@ -44,7 +44,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   }
 
   async trackEvent(props: EventProps) {
-    await GoogleTransport.send(this.buildRequest(HitType.Event, props), this.transportConfig.debug);
+    await this.send(this.buildRequest(HitType.Event, props));
   }
 
   protected buildRequest(hitType: HitType, props?: EventProps) {

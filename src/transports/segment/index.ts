@@ -18,15 +18,14 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   async identifyUser() {
     const { emailDomain, organization, operatingSystem } = this.userConfig;
 
-    await SegmentTransport.send(
+    await this.send(
       this.buildRequest('/identify', {
         traits: {
           email_domain: emailDomain,
           organization,
           operating_system: operatingSystem,
         },
-      }),
-      this.transportConfig.debug
+      })
     );
   }
 
@@ -34,14 +33,13 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
     // Set the current whisper name so that we can use it in the event properties
     this.currentWhisperName = name;
 
-    await SegmentTransport.send(
+    await this.send(
       this.buildRequest('/page', {
         name: this.currentWhisperName,
         properties: {
           whisper_updated: isUpdated,
         },
-      }),
-      this.transportConfig.debug
+      })
     );
   }
 
@@ -73,7 +71,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   }
 
   async trackEvent(props: TrackProps) {
-    await SegmentTransport.send(this.buildRequest('/track', props), this.transportConfig.debug);
+    await this.send(this.buildRequest('/track', props));
   }
 
   protected buildRequest(endpoint: string, props: SegmentProps) {
