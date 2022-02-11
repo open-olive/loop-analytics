@@ -6,14 +6,14 @@ import { GoogleTransportConfig, EventProps, HitType } from './types';
 export * as GoogleTransportTypes from './types';
 
 export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
-  baseUrl = 'https://google-analytics.com/collect';
+  baseUrl = `https://google-analytics.com/${this.transportConfig.debug ? 'debug/' : ''}collect`;
 
   async trackWhisperDisplayed(name: string, isUpdated: boolean) {
     // Set current whisper for events to reference
     this.currentWhisperName = name;
 
     // Tell Google there was a page view
-    await GoogleTransport.send(this.buildRequest(HitType.PageView));
+    await this.send(this.buildRequest(HitType.PageView));
 
     // Also send an event for it
     await this.trackEvent({
@@ -44,7 +44,7 @@ export class GoogleTransport extends BaseTransport<GoogleTransportConfig> {
   }
 
   async trackEvent(props: EventProps) {
-    await GoogleTransport.send(this.buildRequest(HitType.Event, props));
+    await this.send(this.buildRequest(HitType.Event, props));
   }
 
   protected buildRequest(hitType: HitType, props?: EventProps) {

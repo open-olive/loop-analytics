@@ -26,10 +26,14 @@ export abstract class BaseTransport<
   constructor(readonly transportConfig: T, readonly userConfig: U, readonly loopConfig: L) {}
 
   // All Transports will be using LDK's network call, this helper method reduces redundancy
-  protected static async send(request: network.HTTPRequest) {
-    const { statusCode } = await network.httpRequest(request);
+  protected async send(request: network.HTTPRequest) {
+    const { statusCode, body } = await network.httpRequest(request);
     if (statusCode < 200 || statusCode >= 300) {
       console.error(`Request failed with status code ${statusCode}: ${request.url}`);
+    }
+    if (this.transportConfig.debug) {
+      console.debug(`Request: ${request}`);
+      console.debug(`Response: ${await network.decode(body)}`);
     }
   }
 
