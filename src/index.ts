@@ -11,6 +11,10 @@ import * as Transports from './transports';
 class AnalyticsClient {
   constructor(public transport?: Transports.BaseTransport) {}
 
+  get currentWhisperName() {
+    return this.transport?.currentWhisperName;
+  }
+
   /** Provided for setting the transport after instancing */
   setTransport(transport: Transports.BaseTransport) {
     this.transport = transport;

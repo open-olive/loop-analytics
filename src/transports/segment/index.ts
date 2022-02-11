@@ -25,7 +25,8 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
           organization,
           operating_system: operatingSystem,
         },
-      })
+      }),
+      this.transportConfig.debug
     );
   }
 
@@ -39,7 +40,8 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
         properties: {
           whisper_updated: isUpdated,
         },
-      })
+      }),
+      this.transportConfig.debug
     );
   }
 
@@ -71,7 +73,7 @@ export class SegmentTransport extends BaseTransport<SegmentTransportConfig, Segm
   }
 
   async trackEvent(props: TrackProps) {
-    await SegmentTransport.send(this.buildRequest('/track', props));
+    await SegmentTransport.send(this.buildRequest('/track', props), this.transportConfig.debug);
   }
 
   protected buildRequest(endpoint: string, props: SegmentProps) {
